@@ -16,7 +16,7 @@ class ExpenseSharingApp:
 
     def get_friends(self):
         '''
-        To get users in involved int the transaction
+        To get users in involved int the transaction limited to 5 users
         :return: PeopleInvolvedInTransaction
                  new_user - Newly added users
         '''
@@ -24,7 +24,10 @@ class ExpenseSharingApp:
             try:
                 self.numberOfPeople = int(input("Enter Number of People: "))
                 if self.numberOfPeople >0:
-                     break
+                    if self.numberOfPeople < 6:
+                        break
+                    else:
+                        print("Error:Only Maximum of 5 users can be added")
                 else:
                     print("Error: Enter postive values")
             except ValueError:
@@ -46,9 +49,9 @@ class ExpenseSharingApp:
                         else:
                             print("Error: Name already exists. Please enter a unique name.")
                     else:
-                        print("Error: Only alphabetical characters are allowed for the name")
+                        print("Error: Only alphabetical letters are permitted.")
                 except ValueError:
-                    print("Error: Only alphabetical characters are allowed for the name")
+                    print("Error: Only alphabetical letters are permitted.")
             PeopleInvolvedInTransaction.append(name)
             self.new_friend = True
 
@@ -67,7 +70,7 @@ class ExpenseSharingApp:
                     self.existing_friend = True
 
             print("Newly added people", new_user)
-            print("Existing users involved in this transaction", existing_friends)
+            print("Existing users being a  part of this transaction", existing_friends)
 
         return PeopleInvolvedInTransaction, new_user
 
@@ -181,7 +184,7 @@ class ExpenseSharingApp:
 def main():
     Transaction = ExpenseSharingApp()
     while True:
-        print("\n Please choose any action \n")
+        print("\n Please choose any action")
         print("1. Add Expense")
         print("2. Exit")
         while True:
