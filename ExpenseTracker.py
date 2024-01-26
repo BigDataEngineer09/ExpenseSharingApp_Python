@@ -29,7 +29,6 @@ class ExpenseSharingApp:
                 try:
                     name = input("Enter Friend name: ").lower()
                     if name.isalpha():
-                        self.friends.append(name)
                         break  # Exit the loop if the input is valid
                     else:
                         print("Error: Only alphabetical characters are allowed for the name")
@@ -76,56 +75,69 @@ class ExpenseSharingApp:
                     self.balances[key] += value
                 else:
                     self.balances[key] = value
-        print("splitted equally",self.balances)
+        #print("splitted equally",self.balances)
 
     def create_individualdict(self,PeopleInvolvedInTransaction,new_user):
         my_list = list(self.friends)
         my_dict = self.balances
         if len(self.individual_dicts) == 0:
             for user in my_list:
-                self.individual_user_dict = {other_user: 0 for other_user in my_list if other_user != user}
+                self.individual_user_dict = {other_user: 0.0 for other_user in my_list if other_user != user}
                 self.individual_dicts[f'{user}'] = self.individual_user_dict
-        elif self.new_friend==True:
+        if self.new_friend:
                 for user in new_user:
-                    new_profile = {other_user: 0 for other_user in PeopleInvolvedInTransaction if other_user != user }
-                    print("### new_profile: ",new_profile)
+                    new_profile = {other_user: 0.0 for other_user in PeopleInvolvedInTransaction if other_user != user }
                     self.individual_dicts[user]=new_profile
+                   # print("/n ### new_profile: ", self.individual_dicts[user])
                 for person, value in self.individual_dicts.items():
                     print(f"{person} = {value}")
+        if self.existing_friend and self.new_friend:
+            for user in PeopleInvolvedInTransaction:
+                for i in range(0,len(new_user)):
+                    newUser=new_user[i]
+                    if user != newUser:
+                        if newUser not in self.individual_dicts[user]:
+                            self.individual_dicts[user][newUser] = 0.0
+                            #print("#### Updated profile:", self.individual_dicts[user])
+        if self.existing_friend:
+            otherUser=[]
+            for user in PeopleInvolvedInTransaction:
+                if user!=self.paidby:
+                    otherUser.append(user)
+                for i in range(0,len(otherUser)):
+                        if otherUser[i] not in self.individual_dicts[self.paidby] :
+                            self.individual_dicts[self.paidby][otherUser[i]] = 0.0
+                            #print("#### Updated profile:", self.individual_dicts[user])
+
+
         # Print individual dictionaries
         for key, value in self.individual_dicts.items():
-            print(f"{key} = {value}")
+            #print(f"{key} = {value}")
             PersonWhoPaidAmount=f"{key}"
             if PersonWhoPaidAmount == self.paidby:
                     for name in PeopleInvolvedInTransaction:
                         if name != self.paidby:
-                            self.individual_dicts[PersonWhoPaidAmount][name] += self.balances[name] / (
-                                        len(PeopleInvolvedInTransaction) - 1)
+                            balance_PersonWhoPaid = self.individual_dicts[PersonWhoPaidAmount][name]
+                            balance_otherUser=self.individual_dicts[name][PersonWhoPaidAmount]
+                            if balance_otherUser ==0 and balance_PersonWhoPaid ==0:
+                                self.individual_dicts[PersonWhoPaidAmount][name] += self.split_equal_amount
+                            elif balance_otherUser<=self.split_equal_amount:
+                                self.individual_dicts[name][PersonWhoPaidAmount] =0
+                                self.individual_dicts[PersonWhoPaidAmount][name]=self.split_equal_amount - balance_otherUser
+                            else:
+                                self.individual_dicts[name][PersonWhoPaidAmount]-=self.split_equal_amount
 
+                            #self.individual_dicts[PersonWhoPaidAmount][name] +=self.split_equal_amount
+        '''
         print("after changes : ")
         for person, value in self.individual_dicts.items():
             print(f"{person} = {value}")
-
+        '''
         for person,value in self.individual_dicts.items():
                 print(str(person).upper(),":")
                 d=self.individual_dicts[person]
                 for name,amount in d.items():
                     print("- ",name, " owes " ,amount)
-    def settle_balances(self,PeopleInvolvedInTransaction):
-        amount_to_settle=self.split_equal_amount
-        for user in PeopleInvolvedInTransaction:
-            for key, value in self.individual_dicts.items():
-                print(f"{key} = {value}")
-                PersonWhoPaidAmount = f"{key}"
-                if PersonWhoPaidAmount == self.paidby:
-                    for i in PeopleInvolvedInTransaction:
-                        if i == PersonWhoPaidAmount:
-                            for name in PeopleInvolvedInTransaction:
-                                if name != PersonWhoPaidAmount:
-                                    self.individual_dicts[PersonWhoPaidAmount][name] = self.balances[name]
-
-
-
 
     def display_amount(self):
         for name in self.friends:
@@ -159,8 +171,10 @@ def main():
         elif choice == 3:
             Transaction.split_equally(PeopleInvolved)
         elif choice == 4:
-            Transaction.display_amount()
             Transaction.create_individualdict(PeopleInvolved,new_user)
+
+
+
         elif choice == 5:
             break
         else:
