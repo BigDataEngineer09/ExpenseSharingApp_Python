@@ -2,6 +2,9 @@
 class ExpenseSharingApp:
 
     def __init__(self):
+        '''
+        Constructor to initiate variables
+        '''
         self.friends = []
         self.new_friends = []
         self.numberOfPeople= 0
@@ -13,6 +16,11 @@ class ExpenseSharingApp:
         self.paidby=''
 
     def get_friends(self):
+        '''
+        To get users in involved int the transaction
+        :return: PeopleInvolvedInTransaction
+                 new_user - Newly added users
+        '''
         while True:
             try:
                 self.numberOfPeople = int(input("Enter Number of People: "))
@@ -27,7 +35,7 @@ class ExpenseSharingApp:
         for i in range(0, self.numberOfPeople):
             while True:
                 try:
-                    name = input("Enter Friend name: ").lower()
+                    name = input("Enter the user name: ").lower()
                     if name.isalpha():
                         break  # Exit the loop if the input is valid
                     else:
@@ -39,12 +47,12 @@ class ExpenseSharingApp:
 
         if len(self.friends)==0:
             self.friends=PeopleInvolvedInTransaction
-            print("New Users: ",PeopleInvolvedInTransaction)
+            #print("New Users: ",PeopleInvolvedInTransaction)
         else:
             for user in PeopleInvolvedInTransaction:
                 if user not in self.friends:
                     new_user.append(user)
-                    print("new users: ",user)
+                   # print("new users: ",user)
                     self.new_friend = True
                     self.friends.append(user)
                 else:
@@ -52,7 +60,7 @@ class ExpenseSharingApp:
                     self.existing_friend = True
 
             print("Newly added people",new_user)
-            print("Existing  people involved in transaction", existing_friends)
+            print("Existing users involved in this transaction", existing_friends)
 
         return PeopleInvolvedInTransaction,new_user
 
@@ -61,6 +69,11 @@ class ExpenseSharingApp:
         self.paidby = input("Paidby").lower()
 
     def split_equally(self,PeopleInvolvedInTransaction):
+        '''
+        to split the expense in equal shares
+        :param PeopleInvolvedInTransaction:
+        :return: none
+        '''
         self.split_equal_amount= self.total_expense/self.numberOfPeople
         if len(self.balances) ==0:
             currentTransactionBalance= {name: self.split_equal_amount for name in PeopleInvolvedInTransaction}
@@ -75,9 +88,15 @@ class ExpenseSharingApp:
                     self.balances[key] += value
                 else:
                     self.balances[key] = value
-        #print("splitted equally",self.balances)
+        print("splitted equally",self.split_equal_amount)
 
     def create_individualdict(self,PeopleInvolvedInTransaction,new_user):
+        '''
+        To create individual dictionaries to add and settle the balances of each user and display who owns whom
+        :param PeopleInvolvedInTransaction:
+        :param new_user:
+        :return: none
+        '''
         my_list = list(self.friends)
         my_dict = self.balances
         if len(self.individual_dicts) == 0:
@@ -88,9 +107,8 @@ class ExpenseSharingApp:
                 for user in new_user:
                     new_profile = {other_user: 0.0 for other_user in PeopleInvolvedInTransaction if other_user != user }
                     self.individual_dicts[user]=new_profile
-                   # print("/n ### new_profile: ", self.individual_dicts[user])
-                for person, value in self.individual_dicts.items():
-                    print(f"{person} = {value}")
+                #for person, value in self.individual_dicts.items():
+                    #print(f"{person} = {value}")
         if self.existing_friend and self.new_friend:
             for user in PeopleInvolvedInTransaction:
                 for i in range(0,len(new_user)):
@@ -98,7 +116,6 @@ class ExpenseSharingApp:
                     if user != newUser:
                         if newUser not in self.individual_dicts[user]:
                             self.individual_dicts[user][newUser] = 0.0
-                            #print("#### Updated profile:", self.individual_dicts[user])
         if self.existing_friend:
             otherUser=[]
             for user in PeopleInvolvedInTransaction:
@@ -112,7 +129,6 @@ class ExpenseSharingApp:
 
         # Print individual dictionaries
         for key, value in self.individual_dicts.items():
-            #print(f"{key} = {value}")
             PersonWhoPaidAmount=f"{key}"
             if PersonWhoPaidAmount == self.paidby:
                     for name in PeopleInvolvedInTransaction:
@@ -127,55 +143,40 @@ class ExpenseSharingApp:
                             else:
                                 self.individual_dicts[name][PersonWhoPaidAmount]-=self.split_equal_amount
 
-                            #self.individual_dicts[PersonWhoPaidAmount][name] +=self.split_equal_amount
-        '''
-        print("after changes : ")
-        for person, value in self.individual_dicts.items():
-            print(f"{person} = {value}")
-        '''
-        for person,value in self.individual_dicts.items():
-                print(str(person).upper(),":")
-                d=self.individual_dicts[person]
-                for name,amount in d.items():
-                    print("- ",name, " owes " ,amount)
+
 
     def display_amount(self):
-        for name in self.friends:
-            print(f"{name}:")
-            print(f" - Owes: {self.balances[name]:.2f} Euros")
+        print("\n_______________ BALANCES ___________________")
+        for person, value in self.individual_dicts.items():
+            print(str(person).upper(), ":")
+            d = self.individual_dicts[person]
+            for name, amount in d.items():
+                print("- ", name, " owes ", amount)
 
 
 def main():
     Transaction = ExpenseSharingApp()
     while True:
-        print("Please choose any action \n")
-        print("1. Add Friends")
-        print("2. Add Expense")
-        print("3. Split Equally")
-        print("4. Display balances")
-        print("5. Exit")
+        print("\n Please choose any action \n")
+        print("1. Add Expense")
+        print("2. Exit")
         while True:
             try:
-                choice = int(input("Enter a value from 1 to 5: "))
+                choice = int(input("Enter a value from 1 to 2: "))
                 if 1 <= choice <= 5:
                     break  # Exit the loop if the input is valid
                 else:
-                    print("Error: Please enter a digit from 1 to 5.")
+                    print("Error: Please enter a digit from 1 and 2.")
             except ValueError:
                 print("Error: Please enter a valid digit.")
 
         if choice == 1:
             PeopleInvolved,new_user = Transaction.get_friends()
-        elif choice == 2:
             Transaction.get_TotalExpense()
-        elif choice == 3:
             Transaction.split_equally(PeopleInvolved)
-        elif choice == 4:
             Transaction.create_individualdict(PeopleInvolved,new_user)
-
-
-
-        elif choice == 5:
+            Transaction.display_amount()
+        elif choice == 2:
             break
         else:
             print("Invalid choice. Please choose a valid option.")
