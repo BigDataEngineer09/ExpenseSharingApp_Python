@@ -31,13 +31,18 @@ class ExpenseSharingApp:
         existing_friends=[]
         new_user=[]
         PeopleInvolvedInTransaction=[]
+        names=[]
 
         for i in range(0, self.numberOfPeople):
             while True:
                 try:
                     name = input("Enter the user name: ").lower()
                     if name.isalpha():
-                        break  # Exit the loop if the input is valid
+                        if name not in names:
+                            names.append(name)
+                            break  # Exit the loop if the input is valid
+                        else:
+                            print("Error: Name already exists. Please enter a unique name.")
                     else:
                         print("Error: Only alphabetical characters are allowed for the name")
                 except ValueError:
@@ -64,9 +69,23 @@ class ExpenseSharingApp:
 
         return PeopleInvolvedInTransaction,new_user
 
-    def get_TotalExpense(self):
-        self.total_expense = float(input("Enter the Total Amount: "))
-        self.paidby = input("Paidby").lower()
+    def get_TotalExpense(self,PeopleInvolvedInTransaction):
+        while True:
+            try:
+                self.total_expense = int(input("Enter the Total Amount: "))
+                break  # Exit the loop if the input is valid
+            except ValueError:
+                print("Error: Please enter a valid amount.")
+        while True:
+                try:
+                    self.paidby = input("Paidby").lower()
+                    if self.paidby in PeopleInvolvedInTransaction:
+                        break  # Exit the loop if the input is valid
+                    else:
+                        print("Error: This User does not exist in transaction.")
+                except ValueError:
+                    print("Error: Please enter a valid user.")
+
 
     def split_equally(self,PeopleInvolvedInTransaction):
         '''
@@ -101,11 +120,11 @@ class ExpenseSharingApp:
         my_dict = self.balances
         if len(self.individual_dicts) == 0:
             for user in my_list:
-                self.individual_user_dict = {other_user: 0.0 for other_user in my_list if other_user != user}
+                self.individual_user_dict = {other_user: 0 for other_user in my_list if other_user != user}
                 self.individual_dicts[f'{user}'] = self.individual_user_dict
         if self.new_friend:
                 for user in new_user:
-                    new_profile = {other_user: 0.0 for other_user in PeopleInvolvedInTransaction if other_user != user }
+                    new_profile = {other_user: 0 for other_user in PeopleInvolvedInTransaction if other_user != user }
                     self.individual_dicts[user]=new_profile
                 #for person, value in self.individual_dicts.items():
                     #print(f"{person} = {value}")
@@ -115,7 +134,7 @@ class ExpenseSharingApp:
                     newUser=new_user[i]
                     if user != newUser:
                         if newUser not in self.individual_dicts[user]:
-                            self.individual_dicts[user][newUser] = 0.0
+                            self.individual_dicts[user][newUser] = 0
         if self.existing_friend:
             otherUser=[]
             for user in PeopleInvolvedInTransaction:
@@ -123,10 +142,10 @@ class ExpenseSharingApp:
                     otherUser.append(user)
                 for i in range(0,len(otherUser)):
                         if otherUser[i] not in self.individual_dicts[self.paidby] :
-                            self.individual_dicts[self.paidby][otherUser[i]] = 0.0
+                            self.individual_dicts[self.paidby][otherUser[i]] = 0
                             print("#### Updated profile:", self.individual_dicts[user])
                         if self.paidby not in self.individual_dicts[otherUser[i]]:
-                            self.individual_dicts[otherUser[i]][self.paidby] = 0.0
+                            self.individual_dicts[otherUser[i]][self.paidby] = 0
                             print("#### Updated profile:", self.individual_dicts[otherUser[i]])
 
         # Print individual dictionaries
@@ -174,7 +193,7 @@ def main():
 
         if choice == 1:
             PeopleInvolved,new_user = Transaction.get_friends()
-            Transaction.get_TotalExpense()
+            Transaction.get_TotalExpense(PeopleInvolved)
             Transaction.split_equally(PeopleInvolved)
             Transaction.create_individualdict(PeopleInvolved,new_user)
             Transaction.display_amount()
