@@ -190,7 +190,7 @@ def main():
         while True:
             try:
                 choice = int(input("Enter a value from 1 to 2: "))
-                if 1 <= choice <= 5:
+                if 1 <= choice <= 2:
                     break   
                 else:
                     print("Error: Please enter a digit from 1 and 2.")
