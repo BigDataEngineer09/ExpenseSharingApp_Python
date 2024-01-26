@@ -124,8 +124,10 @@ class ExpenseSharingApp:
                 for i in range(0,len(otherUser)):
                         if otherUser[i] not in self.individual_dicts[self.paidby] :
                             self.individual_dicts[self.paidby][otherUser[i]] = 0.0
-                            #print("#### Updated profile:", self.individual_dicts[user])
-
+                            print("#### Updated profile:", self.individual_dicts[user])
+                        if self.paidby not in self.individual_dicts[otherUser[i]]:
+                            self.individual_dicts[otherUser[i]][self.paidby] = 0.0
+                            print("#### Updated profile:", self.individual_dicts[otherUser[i]])
 
         # Print individual dictionaries
         for key, value in self.individual_dicts.items():
