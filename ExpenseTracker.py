@@ -281,7 +281,7 @@ def main():
         while True:
             try:
                 choice = int(input("    Please choose an option:  "))
-                if 1 <= choice <= 4:
+                if 1 <= choice <= 2:
                     break
                 else:
                     print("Error: Please enter a digit from 1 and 2.")
