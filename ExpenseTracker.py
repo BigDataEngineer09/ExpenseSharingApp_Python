@@ -160,8 +160,12 @@ class ExpenseSharingApp:
             currentTransactionBalance = {}
             try:
                 for user in list:
-                    custom_amount = float(input(f"Enter the amount paid by {user}: "))
-                    if custom_amount >= 0:
+                    if self.paidby== user:
+                        message = f"Enter the amount paid by {user}:"
+                    else:
+                        message = f"Enter the amount to be paid by  {user} to {self.paidby} : "
+                    custom_amount = float(input(message))
+                    if custom_amount > 0:
                         currentTransactionBalance[user] = custom_amount
                         total_custom_amount += custom_amount
                     else:
