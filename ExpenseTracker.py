@@ -169,14 +169,14 @@ class ExpenseSharingApp:
                         currentTransactionBalance[user] = custom_amount
                         total_custom_amount += custom_amount
                     else:
-                        print("Error: Enter a non-negative amount.")
+                        print("Error: Enter a non-negative or more than 0 value.")
 
                 if total_custom_amount == self.total_expense:
                     print("Transaction balances set based on user input.")
                     break
                 else:
                     print(
-                        f"Error: Total custom amount ({total_custom_amount:.2f}) does not match the total expense ({self.total_expense:.2f}). Please enter amounts again.")
+                        f"Error: Total custom amount ({total_custom_amount:.2f}) does not match the total expense ({self.total_expense:.2f}). Carefully enter the amounts again.")
             except ValueError:
                 print("Error: Please enter a valid amount.")
         return currentTransactionBalance
