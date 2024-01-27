@@ -13,6 +13,8 @@ class ExpenseSharingApp:
         self.new_friend = False
         self.existing_friend = False
         self.paidby = ''
+        self.splitted_Equally = False
+        self.splitted_Unequally = False
 
     def get_friends(self):
         '''
@@ -22,14 +24,14 @@ class ExpenseSharingApp:
         '''
         while True:
             try:
-                self.numberOfPeople = int(input("Enter Number of People: "))
-                if self.numberOfPeople >0:
+                self.numberOfPeople = int(input("\nEnter Number of users : "))
+                if self.numberOfPeople >1:
                     if self.numberOfPeople < 6:
                         break
                     else:
                         print("Error:Only Maximum of 5 users can be added")
                 else:
-                    print("Error: Enter postive values")
+                    print("Error: Transaction should involve more than 1 user")
             except ValueError:
                 print("Error: Please enter a valid digit.")
 
@@ -41,11 +43,11 @@ class ExpenseSharingApp:
         for i in range(0, self.numberOfPeople):
             while True:
                 try:
-                    name = input("Enter the user name: ").lower()
+                    name = input("Enter the user name : ").lower()
                     if name.isalpha():
                         if name not in names:
                             names.append(name)
-                            break   
+                            break
                         else:
                             print("Error: Name already exists. Please enter a unique name.")
                     else:
@@ -69,15 +71,15 @@ class ExpenseSharingApp:
                     existing_friends.append(user)
                     self.existing_friend = True
 
-            print("Newly added people", new_user)
-            print("Existing users being a  part of this transaction", existing_friends)
+           # print("Newly added people ", new_user)
+            #print("Existing users being a  part of this transaction ", existing_friends)
 
         return PeopleInvolvedInTransaction, new_user
 
     def get_TotalExpense(self, PeopleInvolvedInTransaction):
         while True:
             try:
-                self.total_expense = float(input("Enter the Total Amount: "))
+                self.total_expense = float(input("Enter the Total Amount in Euros: "))
                 if self.total_expense>0:
                      break
                 else:
@@ -86,9 +88,9 @@ class ExpenseSharingApp:
                 print("Error: Please enter a valid amount.")
         while True:
             try:
-                self.paidby = input("Paidby").lower()
+                self.paidby = input("Paidby : ").lower()
                 if self.paidby in PeopleInvolvedInTransaction:
-                    break  
+                    break
                 else:
                     print("Error: This User does not exist in transaction.")
             except ValueError:
@@ -100,6 +102,7 @@ class ExpenseSharingApp:
         :param PeopleInvolvedInTransaction:
         :return: none
         '''
+        self.splitted_Equally = True
         self.split_equal_amount = self.total_expense / self.numberOfPeople
         if len(self.balances) == 0:
             currentTransactionBalance = {user: self.split_equal_amount for user in PeopleInvolvedInTransaction}
@@ -114,7 +117,96 @@ class ExpenseSharingApp:
                     self.balances[key] += value
                 else:
                     self.balances[key] = value
-        print("splitted equally", self.split_equal_amount)
+        print("Splitted Equally : ", self.split_equal_amount)
+        self.splitted_Unequally = False
+
+
+    def split_unequally(self, PeopleInvolvedInTransaction,new_user):
+        '''
+        to split the expense unequally based on user input
+        :param PeopleInvolvedInTransaction:
+        :return: none
+        '''
+        self.splitted_Unequally=True
+        while True:
+            total_custom_amount = 0
+            currentTransactionBalance = {}
+            if len(self.balances) == 0:
+                try:
+                    for user in PeopleInvolvedInTransaction:
+                        custom_amount = float(input(f"Enter the amount paid by {user}: "))
+                        if custom_amount >= 0:
+                            currentTransactionBalance[user] = custom_amount
+                            total_custom_amount += custom_amount
+                        else:
+                            print("Error: Enter a non-negative amount.")
+                    # Check if the total amount entered matches the total expense
+                    if total_custom_amount == self.total_expense:
+                        print("Transaction balances set based on user input.")
+                        break
+                    else:
+                        print(
+                            f"Error: Total custom amount ({total_custom_amount:.2f}) does not match the total expense ({self.total_expense:.2f}). Please enter amounts again.")
+                except ValueError:
+                    print("Error: Please enter a valid amount.")
+                self.balances = currentTransactionBalance
+                self.currentTransactionSplittedUnequally = currentTransactionBalance
+
+            elif self.existing_friend != True:
+                for user in new_user:
+                    try:
+                        custom_amount = float(input(f"Enter the amount paid by {user}: "))
+                        if custom_amount >= 0:
+                            currentTransactionBalance[user] = custom_amount
+                            total_custom_amount += custom_amount
+                        else:
+                            print("Error: Enter a non-negative amount.")
+                    except ValueError:
+                        print("Error: Please enter a valid amount.")
+                self.balances.update(currentTransactionBalance)
+                self.currentTransactionSplittedUnequally = currentTransactionBalance
+            else:
+                for user in PeopleInvolvedInTransaction:
+                    try:
+                        custom_amount = float(input(f"Enter the amount paid by {user}: "))
+                        if custom_amount >= 0:
+                            currentTransactionBalance[user] = custom_amount
+                            total_custom_amount += custom_amount
+                        else:
+                            print("Error: Enter a non-negative amount.")
+                    except ValueError:
+                        print("Error: Please enter a valid amount.")
+                #self.balances.update(currentTransactionBalance)
+                self.currentTransactionSplittedUnequally = currentTransactionBalance
+
+            for key, value in currentTransactionBalance.items():
+                if key in self.balances:
+                    self.balances[key] += value
+                else:
+                    self.balances[key] = value
+        self.splitted_Equally=False
+    def check_total_expense(self,list):
+        while True:
+            total_custom_amount = 0
+            currentTransactionBalance = {}
+            try:
+                for user in list:
+                    custom_amount = float(input(f"Enter the amount paid by {user}: "))
+                    if custom_amount >= 0:
+                        currentTransactionBalance[user] = custom_amount
+                        total_custom_amount += custom_amount
+                    else:
+                        print("Error: Enter a non-negative amount.")
+                    # Check if the total amount entered matches the total expense
+                    if total_custom_amount == self.total_expense:
+                        print("Transaction balances set based on user input.")
+                        break
+                    else:
+                        print(
+                            f"Error: Total custom amount ({total_custom_amount:.2f}) does not match the total expense ({self.total_expense:.2f}). Please enter amounts again.")
+            except ValueError:
+                print("Error: Please enter a valid amount.")
+        return currentTransactionBalance
 
     def create_individualdict(self, PeopleInvolvedInTransaction, new_user):
         '''
@@ -151,47 +243,75 @@ class ExpenseSharingApp:
                     if self.paidby not in self.individual_dicts[otherUser[i]]:
                         self.individual_dicts[otherUser[i]][self.paidby] = 0
 
+        # Split Unequally:
+        if self.splitted_Unequally:
+            for key, value in self.individual_dicts.items():
+                PersonWhoPaidAmount = f"{key}"
+                if PersonWhoPaidAmount == self.paidby:
+                    for name in PeopleInvolvedInTransaction:
+                        if name != self.paidby:
+                            balance_PersonWhoPaid = self.individual_dicts[PersonWhoPaidAmount][name]
+                            balance_otherUser = self.individual_dicts[name][PersonWhoPaidAmount]
+                            if balance_otherUser == 0 and balance_PersonWhoPaid == 0:
+                                self.individual_dicts[PersonWhoPaidAmount][name] += self.currentTransactionSplittedUnequally[name]
+                            elif balance_otherUser <= self.individual_dicts[PersonWhoPaidAmount][name]:
+                                self.individual_dicts[name][PersonWhoPaidAmount] = 0
+                                self.individual_dicts[PersonWhoPaidAmount][
+                                    name] = balance_PersonWhoPaid + self.currentTransactionSplittedUnequally[name]
+                            else:
+                                if self.currentTransactionSplittedUnequally[name]<balance_otherUser:
+                                    self.individual_dicts[name][PersonWhoPaidAmount] -= self.currentTransactionSplittedUnequally[name]
+                                else:
+                                    self.individual_dicts[name][PersonWhoPaidAmount] = 0
+                                    self.individual_dicts[PersonWhoPaidAmount][
+                                        name] = self.currentTransactionSplittedUnequally[name] - balance_otherUser
+
+        #Split Equally:
+        else:
         # Update the transaction amounts
-        for key, value in self.individual_dicts.items():
-            PersonWhoPaidAmount = f"{key}"
-            if PersonWhoPaidAmount == self.paidby:
-                for name in PeopleInvolvedInTransaction:
-                    if name != self.paidby:
-                        balance_PersonWhoPaid = self.individual_dicts[PersonWhoPaidAmount][name]
-                        balance_otherUser = self.individual_dicts[name][PersonWhoPaidAmount]
-                        if balance_otherUser == 0 and balance_PersonWhoPaid == 0:
-                            self.individual_dicts[PersonWhoPaidAmount][name] += self.split_equal_amount
-                        elif balance_otherUser <= self.split_equal_amount:
-                            self.individual_dicts[name][PersonWhoPaidAmount] = 0
-                            self.individual_dicts[PersonWhoPaidAmount][
-                                name] = self.split_equal_amount - balance_otherUser
-                        else:
-                            self.individual_dicts[name][PersonWhoPaidAmount] -= self.split_equal_amount
+            for key, value in self.individual_dicts.items():
+                PersonWhoPaidAmount = f"{key}"
+                if PersonWhoPaidAmount == self.paidby:
+                    for name in PeopleInvolvedInTransaction:
+                        if name != self.paidby:
+                            balance_PersonWhoPaid = self.individual_dicts[PersonWhoPaidAmount][name]
+                            balance_otherUser = self.individual_dicts[name][PersonWhoPaidAmount]
+                            if balance_otherUser == 0 and balance_PersonWhoPaid == 0:
+                                self.individual_dicts[PersonWhoPaidAmount][name] += self.split_equal_amount
+                            elif balance_otherUser <= self.split_equal_amount:
+                                self.individual_dicts[name][PersonWhoPaidAmount] = 0
+                                self.individual_dicts[PersonWhoPaidAmount][
+                                    name] = self.split_equal_amount - balance_otherUser
+                            else:
+                                self.individual_dicts[name][PersonWhoPaidAmount] -= self.split_equal_amount
 
     def display_amount(self):
         '''
         To display the balances
         :return:
         '''
-        print("\n_______________ BALANCES ___________________")
+        print("\n§§§§§§§§§§§§§§§§  DASHBOARD  §§§§§§§§§§§§§§§§§ \n")
         for person, value in self.individual_dicts.items():
-            print(str(person).upper(), ":")
+            print("---------------","\033[1m","To ",str(person).upper(),"\033[0m", " ----------------")
+            #print(str(person).upper(), ":")
             d = self.individual_dicts[person]
             for name, amount in d.items():
-                print("- ", name, f" owes  {amount:.2f}")
+                user= str(name)
+                print("                   ", user.title(), f" owes  {amount:.2f}")
+        #print("--------------------------------------------")
 
 
 def main():
     Transaction = ExpenseSharingApp()
     while True:
-        print("\n Please choose any action")
-        print("1. Add Expense")
-        print("2. Exit")
+        print("\n================ EXPENSE TRACKER ===================")
+        print("\n 1. Add Expense")
+        print(" 2. Close the App")
         while True:
             try:
-                choice = int(input("Enter a value from 1 to 2: "))
-                if 1 <= choice <= 2:
-                    break   
+                choice = int(input("    Please choose an option:  "))
+                if 1 <= choice <= 4:
+                    break
                 else:
                     print("Error: Please enter a digit from 1 and 2.")
             except ValueError:
@@ -200,9 +320,26 @@ def main():
         if choice == 1:
             PeopleInvolved, new_user = Transaction.get_friends()
             Transaction.get_TotalExpense(PeopleInvolved)
-            Transaction.split_equally(PeopleInvolved)
-            Transaction.create_individualdict(PeopleInvolved, new_user)
-            Transaction.display_amount()
+
+            while True:
+                try:
+                    print("Do you want to split it \033[1m 'EQUALLY' \033[0m?", end="")
+                    print(" Type \033[1m 'n' \033[0m to split \033[1m 'UNEQUALLY' \033[0m ")
+                    response = input("y/n? : ").lower()
+                    if response == "y" or response == "n":
+                        break
+                    else:
+                        print("Error: Please enter 'y' or 'n'.")
+                except ValueError:
+                    print("Error: Please enter a valid response.")
+            if response == "y":
+                Transaction.split_equally(PeopleInvolved)
+                Transaction.create_individualdict(PeopleInvolved, new_user)
+                Transaction.display_amount()
+            else:
+                Transaction.split_unequally(PeopleInvolved,new_user)
+                Transaction.create_individualdict(PeopleInvolved, new_user)
+                Transaction.display_amount()
         elif choice == 2:
             break
         else:
